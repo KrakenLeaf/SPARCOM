@@ -1,0 +1,152 @@
+% Global parameters
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+MovieParams.FullMovieLength           = 361;         	  		 	% Total number of frames in the movie       
+MovieParams.MovieBlockLength          = 361;           	 		 	% Divide the movie into blocks with this length
+
+% General parameters - these are optional and do not affect SPARCOM processing
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+% Supported methods: 'same', 'gaussian' - Leave 'same', no need to change
+GenParams.PostProc.Method             = 'same'; 
+%GenParams.PostProc.Method            = 'gaussian';          		% Post processing parameters of the SR image
+GenParams.PostProc.Sigma              = 0.01;
+GenParams.PostProc.ColorMap           = 'hot';
+GenParams.PostProc.ShowImage          = 0;
+
+% Patch based analysis parameters
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+GenParams.Patches.DoPatches           = 1;							% 0 - works on the entire field of view. 1 - divides to patches
+GenParams.Patches.PatchDimensions.X   = 16; 32;                     % XY size of a single patch
+GenParams.Patches.PatchDimensions.Y   = 16; 32; 
+GenParams.Patches.Overlap.X           = 8; 12;             			% Overlap [in pixels] between patches
+GenParams.Patches.Overlap.Y           = 8; 12;
+
+% Denoising parameters
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+MovieParams.DoDenoising               = 0;                          % 1 - Do SVD to remove noise and background, 0 - take no action
+MovieParams.DenoisingPer              = [3 150];                    % Take only the eigenvalues between [a b] - reject lowest (auto-fluorescence) and highest (noise)
+
+% Movie sequence parameters
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+MovieParams.SaveFolder                = 'Figures\Example';          % Location in which to save the output
+
+% Input data types are 'mat', 'txt', 'tif' - uncomment only the file type you want to use. TIFF recommended
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%MovieParams.InputDataType            = 'mat';                      % MAT file
+%MovieParams.Name                     = 'SOFI';
+
+%MovieParams.InputDataType            = 'txt';						% TXT file
+%MovieParams.Name                     = 'pack_f01';
+
+MovieParams.InputDataType             = 'tif';						$ TIFF file
+MovieParams.Name                      = 'epfl_short_1';
+
+MovieParams.Path                      = 'Example\EPFL';
+MovieParams.StartFrame 	   	          = 1;							% Start frame
+MovieParams.EndFrame   		          = 361;						% End frame
+MovieParams.SliceSize  		          = 16;   						% Extrude a slice of SliceSize X SliceSize pixels from the center of the F.T. of the image (most of the information) - should be the same as PatchDimensions
+
+MovieParams.Xstart     		          = 1;  						% Take a block from the original movie, starting at position [Xstart, Ystart] and of size BlockSize X BlockSize
+MovieParams.Ystart     		          = 1; 
+MovieParams.BlockSize  	           	  = 64; 						% Total image size you wish to work on
+
+% PSF parameters
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+PSFParams.PSF_Name  		          = 'psf';    		     		% Name of a MAT file containing the 2D (centered) PSF 
+PSFParams.PSF_Path  		          = MovieParams.Path;     		% Location of the PSF
+
+% Wiener prefilter parameters - OBSOLETE!
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+WienerParams.NSR   		              =  -1;     					% Wiener filter parameter. Not recommended for use. Leave as -1
+
+% Restoration algorithm parameters
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+AlgParams.AlgType      		          = 'corr';                  	% 'storm' - perform storm like CS based localization per frame. 'corr' - perform correlations
+%AlgParams.AlgType      	          = 'storm';   
+AlgParams.CSFactor     		          = 8;                       	% Super-resolution up-sampling factor
+
+AlgParams.MMVNumVecs   		          = 1;							% Maximum time-lag for auto-correlation. 1 - variance estimation only
+
+% STORM solvers: 'MatOMP', 'MatFISTA',
+% Correlations solvers: 'pFISTA_diag', 'pFISTA_Iterative', 'pFISTA_diag_TV', 'pFISTA_diag_analysis', 'pFISTA_diag_BM3D'
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+% AlgParams.Solver       	          = 'MatOMP';                 	% Type of optimization solver. Note that some solvers are for 'storm' and others are for 'corr'
+% AlgParams.Solver       	          = 'MatFISTA';
+
+% Correlations solvers
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+ AlgParams.Solver       	          = 'pFISTA_diag'; 
+% AlgParams.Solver                    = 'pFISTA_Iterative';
+% AlgParams.Solver                    = 'pFISTA_diag_TV'; 
+% AlgParams.Solver                    = 'pFISTA_diag_analysis';
+% AlgParams.Solver                    = 'pFISTA_diag_BM3D'; 
+
+% MatFISTA parameters 
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+AlgParams.MatFISTA.IterMax            = 1000;           			 % Maximum number of iterations
+AlgParams.MatFISTA.L0                 = 4500000;          		 	 % Lipschitz constant of the gradient
+AlgParams.MatFISTA.Lambda             = 15;            		 		 % Regularization parameter
+AlgParams.MatFISTA.NonNegOrth         = 1;             			 	 % Orthogonal projection onto the non-negative orthant. 0 - false, 1 - true
+AlgParams.MatFISTA.Beta               = 0.0;           			 	 % In order to avoide numerical problems
+AlgParams.MatFISTA.LambdaBar          = 1e-7;          			 	 % In order to avoide numerical problems
+
+% MatOMP parameters 
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+AlgParams.MatOMP.IterMax              = 100; 5;           		 	 % Maximum number of iterations
+AlgParams.MatOMP.Tol                  = 1e-5;         			 	 % Stopping criterion tolerance
+AlgParams.MatOMP.NonNegOrth           = 1;             			 	 % Orthogonal projection onto the non-negative orthant. 0 - false, 1 - true
+
+% pFISTA_diag parametes
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+AlgParams.pFISTA_diag.Beta            = 1;
+AlgParams.pFISTA_diag.Lambda          = 0.13;   					 % l1 regulariazation parameters. Use [] if you want automatic selection of this parameter, but computations will be slower
+AlgParams.pFISTA_diag.LambdaBar       = 1e-7;
+AlgParams.pFISTA_diag.L0              = [];           			     % Lipschitz constant - keep empty
+AlgParams.pFISTA_diag.N               = [];           				 % The algorithm computes this automatically
+AlgParams.pFISTA_diag.IterMax         = 400;						 % Maximum number of iterations
+AlgParams.pFISTA_diag.NonNegOrth      = 1;            				 % Projection onto the non-negative orthant (non-negative x)
+AlgParams.pFISTA_diag.LargeScale      = 0;            				 % 1 - large scale problem. Calculation takes more time
+
+% pFISTA_Iterative parametes
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+AlgParams.pFISTA_diag.NumOfSteps      = 4;            				 % Total number of "enveloping" iterations
+AlgParams.pFISTA_diag.eps             = 0.0001; 250; 
+
+% pFISTA_diag_TV parametes
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+AlgParams.pFISTA_diag_TV.Beta            	  = 1;
+AlgParams.pFISTA_diag_TV.Lambda         	  = 0.0001;     		 % l1 regulariazation parameters
+AlgParams.pFISTA_diag_TV.LambdaBar      	  = 1e-7;
+AlgParams.pFISTA_diag_TV.L0              	  = [];           		 % Lipschitz constant - keep empty
+AlgParams.pFISTA_diag_TV.N               	  = [];           		 % The algorithm computes this automatically
+AlgParams.pFISTA_diag_TV.IterMax         	  = 500;				 % Maximum number of iterations
+AlgParams.pFISTA_diag_TV.NonNegOrth      	  = 1;            		 % Projection onto the non-negative orthant (non-negative x)
+AlgParams.pFISTA_diag_TV.LargeScale      	  = 0;            		 % 1 - large scale problem. Calculation takes more time
+AlgParams.pFISTA_diag_TV.DenoiseIter     	  = 100;                 % Inner loop, number of denoisig iterations
+AlgParams.pFISTA_diag_TV.TV              	  = 'iso';               % 'iso': Isotropic TV norm, 'l1': Anisotropic TV norm
+AlgParams.pFISTA_diag_TV.mon		 	 	  = 0;			 		 % 0 - no monotonicity (regular), 1 - monotone version
+
+% pFISTA_diag_analysis parametes
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+AlgParams.pFISTA_diag_analysis.Beta            = 1;
+AlgParams.pFISTA_diag_analysis.Lambda          = 0.0005;       		 % l1 regulariazation parameters
+AlgParams.pFISTA_diag_analysis.LambdaBar       = 1e-7;
+AlgParams.pFISTA_diag_analysis.L0              = [];           		 % Lipschitz constant - keep empty
+AlgParams.pFISTA_diag_analysis.N               = [];           		 % The algorithm computes this automatically
+AlgParams.pFISTA_diag_analysis.IterMax         = 2000; 		 	     % Maximum number of iterations
+AlgParams.pFISTA_diag_analysis.NonNegOrth      = 1;            		 % Projection onto the non-negative orthant (non-negative x)
+AlgParams.pFISTA_diag_analysis.LargeScale      = 0;            	 	 % 1 - large scale problem. Calculation takes more time
+AlgParams.pFISTA_diag_analysis.mu			   = 0.00001;			 % Smoothing parameter. mu -> 0
+AlgParams.pFISTA_diag_analysis.AnalysisType    = 'wave2d';			 % Analysis filter type
+AlgParams.pFISTA_diag_analysis.mon			   = 0;			 		 % 0 - no monotonicity (regular), 1 - monotone version
+
+% pFISTA_diag_BM3D parametes
+% -----------------------------------------------------------------------------------------------------------------------------------------------------
+AlgParams.pFISTA_diag_BM3D.Beta                = 1;
+AlgParams.pFISTA_diag_BM3D.Lambda          	   = 10;       			 % l1 regulariazation parameters
+AlgParams.pFISTA_diag_BM3D.LambdaBar       	   = 1e-7;
+AlgParams.pFISTA_diag_BM3D.L0                  = [];           		 % Lipschitz constant - keep empty
+AlgParams.pFISTA_diag_BM3D.N                   = [];           		 % The algorithm computes this automatically
+AlgParams.pFISTA_diag_BM3D.IterMax             = 300;				 % Maximum number of iterations
+AlgParams.pFISTA_diag_BM3D.NonNegOrth          = 1;            		 % Projection onto the non-negative orthant (non-negative x)
+AlgParams.pFISTA_diag_BM3D.LargeScale          = 0;            		 % 1 - large scale problem. Calculation takes more time
+
