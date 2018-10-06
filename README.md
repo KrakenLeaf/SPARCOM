@@ -36,7 +36,7 @@
 	This code is for academic purposes only.
 	
 	If you are using this code, please cite: 
-    1.	Solomon, Oren, et al. "Sparsity-based super-resolution microscopy from correlation information: erratum." Optics Express 26.16 (2018): 20849-20849.
+    1.	Solomon, Oren, et al. "Sparsity-based super-resolution microscopy from correlation information." Optics Express 26.14 (2018): 18238-18269.
 
 
 2. Requirements
