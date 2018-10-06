@@ -116,7 +116,7 @@
 7. Download
 
 	The code is available at http://webee.technion.ac.il/Sites/People/YoninaEldar/software.php
-	and on GitHub: 
+	and on GitHub: https://github.com/KrakenLeaf/SPARCOM 
 
 
 8. Trademarks
